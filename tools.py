@@ -1,5 +1,0 @@
-
-import random
-
-def initialisztion():
-
