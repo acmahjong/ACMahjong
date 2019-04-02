@@ -2,61 +2,85 @@
 import socket, select
 import random
 import json
+from utils.utils import *
 
-player_list = []
-recv_buffer = 4096
-port = 5000
+class Server:
 
-yama = []
-idx = 0
-lastIndex = 0
-doras = []
-uradoras = []
+	player_list = []
+	player_count = 2
 
-def initialize():
-	yama.clear()
-	for i in range(136):
-		yama.append(i)
-	random.shuffle(yama)	 
+	yama = []
 	idx = 0
-	lastIndex = 122
-	
+	lastIdx = 0
+	doras = []
+	uradoras = []
 
-def distribute(oya):
-	for i in range(4):
-		curPlayer = (i + oya) % 4
-		ar = []
-		for _ in range(13):
-			ar.append(yama[idx])
-			idx = idx + 1
-		json.dumps({"key" : "distribute", "tiles" : ar, "oya" : oya, })
-		player_list[curPlayer][0].send("")
-		txt = player_list[curPlayer][0].recv(recv_buffer)
-		print(txt)
+	def initialize(self):
+		self.yama.clear()
+		for i in range(136):
+			self.yama.append(i)
+		for i in self.yama:
+			print(get34Str(i), end=" ")
+		print("")
+		random.shuffle(self.yama)	 
+		for i in self.yama:
+			print(get34Str(i), end=" ")
+		print("")
+		self.idx = 0
+		self.lastIdx = 122
+		self.doras.append(self.yama[self.lastIdx + 8])
+		
 
+	def distribute(self, oya):
+		for i in range(self.player_count):
+			curPlayer = (i + oya) % self.player_count
+			ar = []
+			for _ in range(13):
+				ar.append(self.yama[self.idx])
+				self.idx = self.idx + 1
+			dat = json.dumps({"key" : "distribute", "tiles" : ar, "oya" : oya, "dora" : get34Str(getNextTile(self.doras[0]))})
+			print(dat)
+			self.player_list[curPlayer][0].send(dat.encode())
+			txt = self.player_list[curPlayer][0].recv(4096).decode()
+			print(txt)
+
+	def giveTileTo(self, player, tile:
+		
+
+	def startround(oya):
+		curplayer = oya
+		while True:
+			
+			if self.idx == lastIdx:
+				break
+
+
+	def main(self):
+		server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		server_socket.bind(("0.0.0.0", 5000))
+		server_socket.listen(10)
+
+		print("waiting for players.....")
+
+		while len(self.player_list) < self.player_count:
+			read_sockets, write_sockets, error_sockets = select.select([server_socket], [], [])
+			sockfd, addr = server_socket.accept()
+			print("player (%s, %s) connected" % addr)
+			name = sockfd.recv(4096).decode()
+			if name:
+				print("name : %s" % name)
+			self.player_list.append([sockfd, addr, name])
+
+		GAME_COUNT = 1
+		BANBA = 0
+		OYA = random.randint(0, 3)
+
+		self.initialize()
+		self.distribute(OYA)
+
+		self.startround()
 
 if __name__ == "__main__":
-	
-	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # this has no effect, why ?
-	server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	server_socket.bind(("0.0.0.0", port))
-	server_socket.listen(10)
-
-	print("waiting for players.....")
-
-	while len(player_list) < 4:
-		read_sockets, write_sockets, error_sockets = select.select([server_socket], [], [])
-		sockfd, addr = server_socket.accept()
-		player_list.append([sockfd, addr])
-		print("player (%s, %s) connected" % addr)
-		name = sockfd.recv(recv_buffer)
-		if name:
-			print("name : %s" % name)
-
-	GAME_COUNT = 1
-	BANBA = 0
-	OYA = random.randint(0, 3)
-
-	initialize()
-	distribute()
+	a = Server()
+	a.main()

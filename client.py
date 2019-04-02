@@ -6,16 +6,16 @@ if __name__ == "__main__":
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # s.settimeout(2000)
-	name = str(random.randint(1,10000))
+	name = "saki " + str(random.randint(1,10000))
 
 	try:
 		s.connect(("localhost", 5000))
 	except:
-		print "connection fail"
+		print("connection fail")
 		sys.exit()
 
-	print "connected!!"
-	s.send(name)
+	print("connected!! as " + name)
+	s.send(name.encode())
 	
 """
 	while True:
@@ -32,6 +32,5 @@ if __name__ == "__main__":
 """
 
 data = s.recv(4096)
-print data
-time.sleep(2)
-s.send("2333" + name)
+print(data.decode())
+s.send(("hahaha    " + name).encode())
