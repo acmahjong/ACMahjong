@@ -1,6 +1,7 @@
 
 import socket, select, string, sys
 import random, time
+import json
 
 if __name__ == "__main__":
 
@@ -31,6 +32,25 @@ if __name__ == "__main__":
 			sock.send("2333" + name)
 """
 
-data = s.recv(4096)
-print(data.decode())
+data = s.recv(4096).decode()
+print(data)
+
+ar = json.loads(data)
+global hand
+hand = ar["tiles"]
+print(hand)
+
 s.send(("hahaha    " + name).encode())
+
+while True:
+	data = s.recv(4096).decode()
+	print("~~~~~~~~~~~~ " + data)
+	dic = json.loads(data)
+	hand.append(dic["tile"])
+	tileToDiscard = random.randint(0, len(hand) - 1)
+	print(hand, tileToDiscard)
+	s.send(json.dumps({"key" : "discard", "tile" : hand[tileToDiscard]}).encode())
+	del(hand[tileToDiscard])
+	time.sleep(1)
+	
+

@@ -1,5 +1,6 @@
 
 import random
+from mahjong.tiles import *
 
 def getNextTile(tile):
 	tile = tile // 4
@@ -14,4 +15,9 @@ def get34Str(tile):
 	tile = tile // 4
 	pfx = ["m","p","s","z"]
 	return str(tile % 9 + 1) + pfx[tile // 9]
-		
+	
+def _cal(tiles):
+	
+
+def calculate(server, i):
+	

@@ -44,14 +44,21 @@ class Server:
 			txt = self.player_list[curPlayer][0].recv(4096).decode()
 			print(txt)
 
-	def giveTileTo(self, player, tile:
-		
+	def giveTileTo(self, player, tile):
+		dat = json.dumps({"key" : "getTile", "tile" : tile})
+		print("send    " + dat)
+		self.player_list[player][0].send(dat.encode())
 
-	def startround(oya):
-		curplayer = oya
+	def startround(self, oya):
+		curPlayer = oya
 		while True:
-			
-			if self.idx == lastIdx:
+			self.giveTileTo(curPlayer, self.yama[self.idx])
+			print("give " + get34Str(self.yama[self.idx]) + " to " + str(curPlayer))
+			res = json.loads(self.player_list[curPlayer][0].recv(4096).decode())
+			print(", who choose to discard " + str(res["tile"]))
+			self.idx = self.idx + 1
+			curPlayer = (curPlayer + 1) % self.player_count
+			if self.idx == self.lastIdx:
 				break
 
 
@@ -74,12 +81,12 @@ class Server:
 
 		GAME_COUNT = 1
 		BANBA = 0
-		OYA = random.randint(0, 3)
+		OYA = random.randint(0, self.player_count - 1)
 
 		self.initialize()
 		self.distribute(OYA)
 
-		self.startround()
+		self.startround(OYA)
 
 if __name__ == "__main__":
 	a = Server()
